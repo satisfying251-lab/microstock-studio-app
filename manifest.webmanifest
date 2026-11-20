@@ -1,9 +1,9 @@
 {
-  "name": "Microstock Studio V3.2",
-  "short_name": "Microstock V3.2",
+  "name": "Microstock Trend & Prompt Lab",
+  "short_name": "Prompt Lab",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#09111f",
-  "theme_color": "#101b2d",
-  "description": "Microstock metadata and keyword workspace optimized for Android"
+  "background_color": "#08111f",
+  "theme_color": "#0b1220",
+  "description": "Riset tren microstock dan prompt gambar siap generate tanpa API key."
 }
