@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="description" content="Microstock Studio V3.1 - hybrid AI microstock assistant">
+<meta name="description" content="Microstock Studio V3.1.2 - hybrid AI microstock assistant">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>Microstock Studio V3.1</title>
+<title>Microstock Studio V3.1.2</title>
 <style>
 :root{--bg:#09111f;--panel:#121f33;--panel2:#192b45;--line:#29415f;--text:#eaf2ff;--muted:#9db0ca;--mint:#54dfbd;--gold:#f3c86b;--red:#ff8585}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
@@ -40,7 +40,7 @@ footer{color:var(--muted);text-align:center;font-size:11px;padding:16px}
 </style>
 </head>
 <body>
-<header><h1>✦ Microstock Studio V3.1</h1><p>OPPO F11 Pro optimized · Hybrid AI · Batch 20–100 · Android 11</p></header>
+<header><h1>✦ Microstock Studio V3.1.2</h1><p>OPPO F11 Pro optimized · Hybrid AI · Batch 20–100 · Android 11</p></header>
 <main>
 <div class="tabs">
 <button data-tab="batch">Batch Analyzer</button><button class="secondary" data-tab="results">Hasil Metadata</button><button class="secondary" data-tab="strategy">Strategi Stock</button><button class="secondary" data-tab="keyworddb">Keyword Database</button><button class="secondary" data-tab="aistudio">AI Studio</button><button class="secondary" data-tab="settings">Mesin AI</button>
@@ -49,7 +49,9 @@ footer{color:var(--muted);text-align:center;font-size:11px;padding:16px}
 <div class="card">
 <h2>1. Upload aset</h2>
 <div class="drop"><strong>Pilih 1–100 gambar</strong><span class="small">JPG, JPEG, PNG, WebP · Maksimum 100 file per batch</span>
-<input id="files" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+<input id="files" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple>
+<p class="small">Format yang didukung: JPG/JPEG dan PNG. Pilih satu atau beberapa gambar sekaligus.</p>
+<p id="fileNotice" class="small" role="status" aria-live="polite">Pilih foto dari Galeri atau File. Jika tipe file Android kosong, aplikasi akan memeriksa nama dan isi gambar.</p>
 </div>
 <div class="row" style="justify-content:space-between;margin-top:12px"><span id="fileCount" class="small">Belum ada gambar dipilih</span><button class="secondary" id="clearBtn">Kosongkan</button></div>
 <div id="thumbs" class="grid" style="margin-top:12px"></div>
@@ -164,7 +166,7 @@ footer{color:var(--muted);text-align:center;font-size:11px;padding:16px}
 </div>
 <div class="card"><h2>Batas batch dan penyimpanan</h2><p>Batch maksimum 100 gambar per pemilihan. Proses berjalan satu per satu agar RAM 6 GB lebih stabil. Metadata disimpan lokal di browser melalui IndexedDB; file gambar asli tidak disimpan oleh aplikasi. Ekspor CSV secara berkala sebagai cadangan. Hapus data situs/browser dapat menghapus riwayat lokal.</p></div>
 </section>
-<footer>Microstock Studio V3.1 · Gratis digunakan · Periksa metadata secara manual sebelum upload.</footer>
+<footer>Microstock Studio V3.1.2 · Gratis digunakan · Periksa metadata secara manual sebelum upload.</footer>
 </main>
 <script type="module" src="./app.js"></script>
 </body></html>

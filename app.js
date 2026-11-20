@@ -17,15 +17,80 @@ function setProgress(done,total){$('bar').style.width=(total?done/total*100:0)+'
 function setTab(tab){for(const id of ['batch','results','strategy','keyworddb','aistudio','settings'])$(id).classList.toggle('hidden',id!==tab);document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('secondary',b.dataset.tab!==tab)})}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 $('mode').onchange=()=>{let m=$('mode').value;$('localInfo').classList.toggle('hidden',m!=='local');$('cloudInfo').classList.toggle('hidden',m!=='cloud');$('hybridInfo').classList.toggle('hidden',m!=='hybrid');$('keyWrap').classList.toggle('hidden',m==='local')};$('mode').onchange();
-$('files').onchange=e=>{
+function extensionOf(name){const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);return m?m[1]:''}
+function mimeForFile(file){
+ const ext=extensionOf(file.name);
+ const byExt={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif',bmp:'image/bmp'};
+ // Android gallery/document providers may report image/jpg, image/pjpeg, or a generic image/* MIME.
+ if(/^image\//i.test(file.type||'')){
+  if(/jpe?g|pjpeg/i.test(file.type))return 'image/jpeg';
+  if(/png/i.test(file.type))return 'image/png';
+  if(/webp/i.test(file.type))return 'image/webp';
+  if(/gif/i.test(file.type))return 'image/gif';
+  if(/bmp/i.test(file.type))return 'image/bmp';
+  return file.type;
+ }
+ return byExt[ext]||'';
+}
+async function sniffImageMime(file){
+ try{
+  const b=new Uint8Array(await file.slice(0,16).arrayBuffer());
+  if(b.length>=3&&b[0]===0xff&&b[1]===0xd8&&b[2]===0xff)return 'image/jpeg';
+  if(b.length>=8&&b[0]===0x89&&b[1]===0x50&&b[2]===0x4e&&b[3]===0x47)return 'image/png';
+  if(b.length>=6&&String.fromCharCode(...b.slice(0,6)).match(/^GIF8[79]a$/))return 'image/gif';
+  if(b.length>=12&&String.fromCharCode(...b.slice(0,4))==='RIFF'&&String.fromCharCode(...b.slice(8,12))==='WEBP')return 'image/webp';
+  if(b.length>=2&&b[0]===0x42&&b[1]===0x4d)return 'image/bmp';
+ }catch(e){}
+ return '';
+}
+async function canDecodeImage(file){
+ // Try ImageBitmap first, but always fall back to HTMLImageElement if Android's decoder rejects it.
+ if(typeof createImageBitmap==='function'){
+  try{
+   const bitmap=await createImageBitmap(file);
+   const ok=bitmap.width>0&&bitmap.height>0;
+   bitmap.close?.();
+   if(ok)return true;
+  }catch(e){/* try browser image element below */}
+ }
+ return await new Promise(resolve=>{
+  const u=URL.createObjectURL(file),img=new Image();
+  let settled=false;
+  const finish=ok=>{if(settled)return;settled=true;URL.revokeObjectURL(u);resolve(ok)};
+  img.onload=()=>finish(img.naturalWidth>0&&img.naturalHeight>0);
+  img.onerror=()=>finish(false);
+  img.src=u;
+ });
+}
+$('files').onchange=async e=>{
  const chosen=[...e.target.files];
  if(chosen.length>100){alert('Maksimum 100 gambar per batch. Pilih ulang maksimal 100.');e.target.value='';return}
- files=chosen.filter(f=>/^image\/(jpeg|png|webp)$/.test(f.type));
- renderThumbs();$('analyzeBtn').disabled=!files.length; e.target.value='';
+ if(!chosen.length)return;
+ files=[];$('analyzeBtn').disabled=true;$('fileCount').textContent='Memeriksa '+chosen.length+' file...';
+ const accepted=[],rejected=[];
+ for(let i=0;i<chosen.length;i++){
+  const f=chosen[i];
+  $('fileNotice').textContent=`Memeriksa file ${i+1}/${chosen.length}: ${f.name||'gambar tanpa nama'}`;
+  try{
+   if(!f.size){rejected.push((f.name||'File tanpa nama')+' (file kosong/0 byte)');continue}
+   const mime=mimeForFile(f)||await sniffImageMime(f);
+   const looksLikeImage=!!mime||String(f.type||'').toLowerCase().startsWith('image/')||['jpg','jpeg','png','webp','gif','bmp'].includes(extensionOf(f.name));
+   if(!looksLikeImage){rejected.push((f.name||'File tanpa nama')+' (bukan file gambar; tipe '+(f.type||'tidak diketahui')+')');continue}
+   const valid=await canDecodeImage(f);
+   if(valid){accepted.push(f)}else{rejected.push((f.name||'File tanpa nama')+' (browser Android tidak dapat mendekode gambar ini; coba buka lalu simpan ulang sebagai JPG)')}
+  }catch(err){rejected.push((f.name||'File tanpa nama')+' (gagal dibaca: '+(err?.message||'kesalahan tidak diketahui')+')')}
+ }
+ files=accepted;renderThumbs();$('analyzeBtn').disabled=!files.length;
+ let msg=`Berhasil membaca ${accepted.length} dari ${chosen.length} gambar.`;
+ if(rejected.length)msg+=' Tidak terbaca: '+rejected.slice(0,5).join('; ')+(rejected.length>5?`; dan ${rejected.length-5} file lainnya.`:'.');
+ $('fileNotice').textContent=msg;
+ $('fileCount').textContent=accepted.length?`${accepted.length} gambar siap dianalisis`:'Belum ada gambar yang terbaca';
+ if(!accepted.length&&chosen.length)alert(msg+' Coba pilih JPG dari Galeri, atau buka foto lalu pilih Bagikan/Simpan salinan sebagai JPG.');
+ e.target.value='';
 };
 function renderThumbs(){
- $('fileCount').textContent=files.length?`${files.length} gambar dipilih`:'Belum ada gambar dipilih';
- $('thumbs').innerHTML=files.map((f,i)=>`<div class="thumb"><img data-thumb="${i}"><div>${i+1}. ${esc(f.name)}</div></div>`).join('');$('thumbs').querySelectorAll('img[data-thumb]').forEach(img=>{const f=files[Number(img.dataset.thumb)],u=URL.createObjectURL(f);img.onload=()=>URL.revokeObjectURL(u);img.onerror=()=>URL.revokeObjectURL(u);img.src=u});
+ $('fileCount').textContent=files.length?`${files.length} gambar siap dianalisis`:'Belum ada gambar yang terbaca';
+ $('thumbs').innerHTML=files.map((f,i)=>`<div class="thumb"><img data-thumb="${i}" alt="Pratinjau ${i+1}"><div>${i+1}. ${esc(f.name||'Gambar '+(i+1))}</div></div>`).join('');$('thumbs').querySelectorAll('img[data-thumb]').forEach(img=>{const f=files[Number(img.dataset.thumb)],u=URL.createObjectURL(f);img.onload=()=>URL.revokeObjectURL(u);img.onerror=()=>{URL.revokeObjectURL(u);img.alt='Pratinjau tidak tersedia'};img.src=u});
 }
 $('clearBtn').onclick=()=>{files=[];renderThumbs();$('analyzeBtn').disabled=true};
 $('forgetKey').onclick=()=>{$('apiKey').value='';alert('API key dibersihkan dari sesi halaman.')};
@@ -39,7 +104,7 @@ async function gemini(file,caption,lang){
  const b64=await toBase64(file);
  const prompt=`Analyze this stock asset image. Return ONLY valid JSON with keys title, description, keywords (exactly 49 distinct relevant English words/short phrases), category, visual_notes. Write title and description in ${lang}. Keep keywords in English for stock marketplaces. Do not invent facts, brands, identities, locations, or actions not clearly visible. Avoid keyword stuffing. Caption from local model: ${caption||'none'}. Title max 150 characters. Description one factual sentence. Keywords must be exactly 49 unique relevant phrases, ordered by importance. The FIRST 10 keywords must be the strongest, most accurate buyer search terms. Title must describe the actual visible subject and context, never generic filler such as 'beautiful image'.`;
  const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
- const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:prompt},{inline_data:{mime_type:file.type,data:b64}}]}],generationConfig:{responseMimeType:'application/json',temperature:0.2}})});
+ const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:prompt},{inline_data:{mime_type:(mimeForFile(file)||file.type||'image/jpeg'),data:b64}}]}],generationConfig:{responseMimeType:'application/json',temperature:0.2}})});
  const data=await res.json();if(!res.ok)throw new Error(data?.error?.message||`Gemini HTTP ${res.status}`);
  const text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
  return parseJson(text);

@@ -38,3 +38,25 @@ IMPORTANT LIMITATIONS / HONEST SCOPE
 - GitHub Pages is static hosting and does not provide a private GPU or backend.
 - No promise of unlimited generation or paid-model-equivalent quality.
 - Always review accuracy, releases, trademarks, people/property rights, and each marketplace's AI content rules before submission.
+
+
+PERBAIKAN UPLOAD V3.1.1
+- Tidak lagi menolak gambar hanya karena MIME type dari Android kosong/generic.
+- Memeriksa ekstensi dan mencoba decode gambar di browser sebelum menerima file.
+- Menampilkan jumlah file yang terbaca dan nama file yang gagal.
+- Mendukung JPG/JPEG, PNG, WebP, GIF, BMP jika browser dapat mendekodenya.
+- HEIC/HEIF bisa tetap tidak didukung oleh browser Android; konversi ke JPG/PNG bila ditolak.
+- Cache service worker dinaikkan agar pembaruan file terpasang.
+
+
+VERSI 3.1.2 - PERBAIKAN UPLOAD GALERI ANDROID
+- Menerima variasi MIME Android seperti image/jpg dan image/pjpeg.
+- Memeriksa tanda tangan file JPEG/PNG/GIF/WebP/BMP jika MIME tidak tersedia.
+- Jika createImageBitmap gagal, otomatis mencoba decoder gambar browser sebagai fallback.
+- Pesan kesalahan upload dibuat lebih informatif.
+- Cache service worker dinaikkan ke V3.1.2 agar pembaruan tidak tertahan cache lama.
+Catatan: HEIC/HEIF tetap bergantung pada dukungan decoder browser Android.
+
+VERSI 3.1.3 - FORMAT FILE
+- Pemilih file Android kini secara eksplisit menampilkan JPG/JPEG dan PNG.
+- Upload multi-file tetap didukung hingga batas batch aplikasi.
