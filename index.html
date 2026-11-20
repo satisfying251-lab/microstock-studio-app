@@ -1,8 +1,170 @@
-<!doctype html><n<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101827"><link rel="manifest" href="manifest.webmanifest"><title>Microstock Studio</title><style>
-:root{--bg:#0b1220;--p:#142238;--line:#2b405b;--txt:#edf4ff;--muted:#9db0c9;--a:#5ee0c0}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui}header{padding:18px;background:#101b2d;border-bottom:1px solid var(--line);font-weight:800;font-size:19px}header small{display:block;color:var(--muted);font-size:12px;font-weight:400}main{max-width:700px;margin:auto;padding:15px 14px 90px}.hero,.card{background:var(--p);border:1px solid var(--line);border-radius:17px;padding:17px;margin:12px 0}.hero{background:linear-gradient(130deg,#174054,#20294b)}h2{margin:5px 0;font-size:23px}h3{margin:0 0 13px}p,.hint{color:var(--muted);line-height:1.5}.field{margin:12px 0}label{display:block;font-size:13px;margin-bottom:6px;color:#cbd9e9}input,textarea,select{width:100%;padding:12px;border-radius:11px;border:1px solid #354b68;background:#0b1728;color:var(--txt);font:inherit}textarea{min-height:85px}button{padding:12px 14px;border:0;border-radius:11px;font-weight:750;background:var(--a);color:#08231d}.alt{background:#263b56;color:var(--txt)}.danger{background:#482632;color:#ffc3c3}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{flex:1}.pages{display:none}.pages.active{display:block}.nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#101827;border-top:1px solid var(--line);padding:7px 4px calc(7px + env(safe-area-inset-bottom))}.nav button{background:transparent;color:var(--muted);flex:1;font-size:11px;padding:8px 2px}.nav button.active{color:var(--a);background:#1a3448}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:#243a54;padding:6px 9px;border-radius:20px;font-size:12px}.preview{display:none;max-width:100%;max-height:180px;margin-top:8px}.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:9px 0}.item small{color:var(--muted)}.notice{background:#302c20;border-left:3px solid #e6bd69;padding:11px;border-radius:8px;color:#f3dfb3;font-size:12px}.hidden{display:none}.count{float:right;color:var(--muted);font-size:12px}
-</style></head><body><header>✦ Microstock Studio<small>Metadata assistant · Gratis · Offline</small></header><main>
-<section id="home" class="pages active"><div class="hero"><b>MICROSTOCK WORKSPACE</b><h2>Siapkan metadata asetmu.</h2><p>Buat judul, deskripsi, keyword, dan CSV untuk membantu pengelolaan aset microstock.</p><button onclick="page('generator')">＋ Buat metadata</button></div><div class="card"><h3>Ringkasan</h3><p><b id="total">0</b> aset tersimpan · Target hingga 49 keyword per aset.</p></div><div class="notice">Hasil metadata adalah draf. Periksa relevansi dan kebenarannya sebelum upload.</div></section>
-<section id="generator" class="pages"><div class="card"><h3>01 · Detail aset</h3><div class="field"><label>Nama file (opsional)</label><input id="filename" placeholder="contoh: golden_glitter_4k.mp4"></div><div class="field"><label>Jenis aset</label><select id="type"><option>Photo</option><option>Video</option><option>Illustration</option><option>Vector</option><option>Background</option><option>Texture</option></select></div><div class="field"><label>Deskripsikan isi aset *</label><textarea id="visual" placeholder="Contoh: golden glitter particles falling on a black background, festive celebration, copy space"></textarea></div><div class="field"><label>Gambar referensi (opsional, hanya preview)</label><input type="file" id="image" accept="image/*"><img id="preview" class="preview"></div><button style="width:100%" onclick="generate()">Buat metadata</button><p class="hint">Versi gratis ini menggunakan template dan kamus kata. Gambar tidak dianalisis otomatis.</p></div><div id="results" class="card hidden"><h3>02 · Hasil metadata</h3><div class="field"><label>Title</label><input id="title"></div><div class="field"><label>Description</label><textarea id="desc"></textarea></div><div class="field"><label>Category</label><select id="category"><option>Abstract</option><option>Backgrounds/Textures</option><option>Business</option><option>Education</option><option>Food</option><option>Nature</option><option>People</option><option>Technology</option><option>Travel</option><option>Other</option></select></div><div class="field"><label>Keywords <span id="kwcount" class="count">0/49</span></label><div id="chips" class="chips"></div><div class="actions"><button class="alt" onclick="copyKeys()">Salin keyword</button><button class="alt" onclick="addKey()">Tambah keyword</button></div></div><div class="actions"><button onclick="save()">Simpan Library</button><button class="alt" onclick="oneCSV()">Export CSV</button></div></div></section>
-<section id="library" class="pages"><div class="card"><h3>Library aset</h3><div id="list"></div><div class="actions"><button onclick="allCSV()">Export semua CSV</button><button class="danger" onclick="clearAll()">Hapus semua</button></div></div></section>
-<section id="settings" class="pages"><div class="card"><h3>Pengaturan & info</h3><p>Aplikasi menyimpan data di browser perangkat ini. Menghapus data browser dapat menghapus Library.</p><div class="notice">Aplikasi belum mengunggah file ke marketplace. Format CSV perlu disesuaikan dengan aturan masing-masing platform. Tidak ada jaminan aset diterima atau terjual.</div></div></section>
-</main><nav class="nav"><button class="active" onclick="page('home',this)">⌂<br>Home</button><button onclick="page('generator',this)">✦<br>Generator</button><button onclick="page('library',this)">▤<br>Library</button><button onclick="page('settings',this)">⚙<br>Info</button></nav><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="Microstock Studio V3.1 - hybrid AI microstock assistant">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>Microstock Studio V3.1</title>
+<style>
+:root{--bg:#09111f;--panel:#121f33;--panel2:#192b45;--line:#29415f;--text:#eaf2ff;--muted:#9db0ca;--mint:#54dfbd;--gold:#f3c86b;--red:#ff8585}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:18px 18px 14px;background:#101b2d;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+h1{font-size:21px;margin:0}header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+main{max-width:850px;margin:auto;padding:16px 14px 100px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
+h2{font-size:17px;margin:0 0 12px}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button,.btn{border:0;border-radius:12px;padding:12px 15px;background:var(--mint);color:#06251f;font-weight:750;font-size:14px;cursor:pointer}
+button.secondary{background:#263b58;color:var(--text);border:1px solid var(--line)}
+button.warn{background:#493b24;color:#ffe3a0}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{width:100%;background:#0c1728;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:12px;font:inherit}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
+.drop{border:1.5px dashed #527397;border-radius:16px;padding:20px;text-align:center;background:#0d192b}
+.drop strong{display:block;margin-bottom:6px}.drop input{margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}
+.thumb{background:#0c1728;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.thumb img{width:100%;height:112px;object-fit:cover;display:block;background:#18263a}
+.thumb div{padding:8px;font-size:12px;overflow-wrap:anywhere}
+.progress{height:9px;border-radius:20px;background:#26364c;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--mint);transition:width .2s}
+.tabs{display:flex;gap:8px;overflow:auto;margin:0 0 14px}.tabs button{white-space:nowrap}
+.asset{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:#0d192b}
+.assethead{display:flex;gap:10px;align-items:center}.assethead img{width:66px;height:66px;object-fit:cover;border-radius:9px}
+.asset textarea{min-height:62px;margin:5px 0}.asset .kw{font-size:12px;color:#c6d7ed;line-height:1.6}
+.status{font-size:12px;color:var(--gold)}.good{color:var(--mint)}.bad{color:var(--red)}
+.hidden{display:none!important}.notice{border-left:4px solid var(--gold);background:#302a1e;padding:12px;border-radius:8px;color:#f5dfac;font-size:13px;line-height:1.5}
+footer{color:var(--muted);text-align:center;font-size:11px;padding:16px}
+@media(min-width:650px){main{padding-top:24px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+</style>
+</head>
+<body>
+<header><h1>✦ Microstock Studio V3.1</h1><p>OPPO F11 Pro optimized · Hybrid AI · Batch 20–100 · Android 11</p></header>
+<main>
+<div class="tabs">
+<button data-tab="batch">Batch Analyzer</button><button class="secondary" data-tab="results">Hasil Metadata</button><button class="secondary" data-tab="strategy">Strategi Stock</button><button class="secondary" data-tab="keyworddb">Keyword Database</button><button class="secondary" data-tab="aistudio">AI Studio</button><button class="secondary" data-tab="settings">Mesin AI</button>
+</div>
+<section id="batch">
+<div class="card">
+<h2>1. Upload aset</h2>
+<div class="drop"><strong>Pilih 1–100 gambar</strong><span class="small">JPG, JPEG, PNG, WebP · Maksimum 100 file per batch</span>
+<input id="files" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+</div>
+<div class="row" style="justify-content:space-between;margin-top:12px"><span id="fileCount" class="small">Belum ada gambar dipilih</span><button class="secondary" id="clearBtn">Kosongkan</button></div>
+<div id="thumbs" class="grid" style="margin-top:12px"></div>
+</div>
+<div class="card">
+<h2>2. Pilih mesin analisis</h2>
+<label>Mode</label><select id="mode"><option value="hybrid" selected>Gabungan: lokal + cloud Gemini (disarankan)</option><option value="local">AI lokal (tanpa API key)</option><option value="cloud">AI cloud Gemini (butuh API key gratis)</option></select>
+<div id="localInfo" class="notice">AI lokal memakai model captioning yang diunduh saat pertama digunakan. Untuk OPPO F11 Pro RAM 6 GB, mulai 1–3 gambar untuk menguji kecepatan dan panas. Model lokal hanya membuat caption; 49 keyword lengkap tetap perlu AI cloud atau penyuntingan manual.</div>
+<div id="cloudInfo" class="notice hidden">Cloud memakai Gemini 2.5 Flash-Lite API langsung dari browser. Masukkan API key sendiri. Jangan bagikan key atau gunakan di perangkat umum. Google mencantumkan free tier terbatas untuk model tertentu; kuota dan ketersediaan dapat berubah. File gambar dikirim ke Google saat dianalisis.</div>
+<div id="hybridInfo" class="notice hidden">Mode gabungan menjalankan caption lokal dahulu, lalu mengirim gambar ke Gemini jika API key diisi. Gemini menyusun title, description, dan target 49 keyword. Jika tanpa key atau cloud gagal, aplikasi memakai caption lokal dan menandai hasil untuk review.</div>
+<div id="keyWrap" class="hidden"><label>Gemini API key</label><input id="apiKey" type="password" autocomplete="off" placeholder="Tempel API key Gemini di sini"><p class="small">Key hanya disimpan di memori halaman, tidak disimpan di GitHub atau LocalStorage.</p></div>
+<label>Bahasa metadata</label><select id="language"><option value="English">English (disarankan untuk microstock)</option><option value="Indonesian">Bahasa Indonesia</option></select>
+<label>Jumlah proses bersamaan</label><select id="concurrency"><option value="1" selected>1 (disarankan untuk OPPO F11 Pro)</option><option value="2">2 (uji jika HP tetap dingin)</option></select>
+<div class="row" style="margin-top:14px"><button id="analyzeBtn" disabled>Analisis batch</button><button class="secondary" id="stopBtn" disabled>Hentikan</button></div>
+<div style="margin-top:14px" class="progress"><span id="bar"></span></div><p id="progressText" class="small">Menunggu gambar.</p>
+</div>
+</section>
+<section id="results" class="hidden">
+<div class="card">
+<div class="row" style="justify-content:space-between"><h2>Hasil metadata</h2><span id="resultCount" class="small">0 aset</span></div>
+<div class="row"><button id="csvBtn" disabled>Ekspor CSV</button><button class="secondary" id="jsonBtn" disabled>Ekspor JSON</button><button class="secondary" id="copyBtn" disabled>Salin semua keyword</button></div>
+<p class="small">Hasil metadata disimpan di browser HP (tanpa menyimpan ulang file gambar). Periksa dan edit sebelum upload.</p><div class="row"><button class="secondary" id="clearSaved">Hapus riwayat metadata tersimpan</button></div>
+<div id="resultsList"></div>
+</div>
+</section>
+
+<section id="strategy" class="hidden">
+<div class="card">
+<h2>Strategi 1 · Riset sebelum produksi</h2>
+<p class="small">Catat hasil pencarian dari marketplace yang kamu riset. Aplikasi tidak mengklaim bisa membaca jumlah hasil Adobe Stock secara otomatis.</p>
+<label>Tema / kata kunci utama</label><input id="researchTopic" placeholder="Contoh: Diwali office party">
+<div class="two">
+<div><label>Jumlah hasil pencarian tema A (padat)</label><input id="competitionA" type="number" min="0" placeholder="Contoh: 1200000"></div>
+<div><label>Jumlah hasil pencarian tema B (celah)</label><input id="competitionB" type="number" min="0" placeholder="Contoh: 8000"></div>
+</div>
+<label>Marketplace yang diriset</label><select id="marketplace"><option>Adobe Stock</option><option>Shutterstock</option><option>Freepik</option><option>Dreamstime</option><option>iStock</option></select>
+<label>Catatan kebutuhan buyer / peluang</label><textarea id="researchNotes" placeholder="Apa yang dicari buyer? Tema spesifik apa yang masih kurang?"></textarea>
+<button id="saveResearch">Simpan catatan riset</button><span id="researchSaved" class="small"></span>
+</div>
+<div class="card">
+<h2>Strategi 2 · Urutan keyword</h2>
+<p>Ketika AI menghasilkan metadata, aplikasi akan memprioritaskan 10 keyword paling penting di bagian awal. Periksa apakah sepuluh keyword tersebut benar-benar menggambarkan isi gambar.</p>
+<div class="notice">Urutan keyword adalah prinsip yang ditampilkan dalam video, bukan jaminan ranking atau penjualan di Adobe Stock.</div>
+</div>
+<div class="card">
+<h2>Strategi 3 · Kalender konten musiman</h2>
+<label>Nama event / musim</label><input id="seasonName" placeholder="Contoh: Ramadan, Natal, Diwali">
+<label>Tanggal hari-H</label><input id="seasonDate" type="date">
+<div class="row" style="margin-top:12px"><button id="calcSeason">Hitung jadwal upload</button><button class="secondary" id="saveSeason">Simpan jadwal</button></div>
+<div id="seasonResult" class="notice" style="margin-top:12px">Pilih event dan tanggalnya. Aplikasi akan menghitung rekomendasi 2–3 bulan sebelum hari-H.</div>
+</div>
+<div class="card">
+<h2>Strategi 4 · Pembuat variasi, bukan duplikat</h2>
+<p class="small">Pilih variasi produksi untuk satu konsep. Gunakan perbedaan visual yang nyata, bukan hanya mengganti nama file.</p>
+<div class="row"><label style="margin:0"><input type="checkbox" class="variation" value="Angle berbeda"> Angle berbeda</label><label style="margin:0"><input type="checkbox" class="variation" value="Copy space"> Copy space</label><label style="margin:0"><input type="checkbox" class="variation" value="Format vertikal"> Format vertikal</label><label style="margin:0"><input type="checkbox" class="variation" value="Komposisi berbeda"> Komposisi berbeda</label><label style="margin:0"><input type="checkbox" class="variation" value="Pencahayaan berbeda"> Pencahayaan berbeda</label></div>
+<label>Konsep utama</label><input id="variationConcept" placeholder="Contoh: wanita minum kopi di rumah">
+<button id="makeVariation">Buat daftar variasi</button>
+<div id="variationResult" class="small" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<h2>Strategi 5 · Konsistensi upload mingguan</h2>
+<label>Target jumlah aset per minggu</label><input id="weeklyTarget" type="number" min="1" max="500" value="10">
+<label>Jumlah aset yang sudah disiapkan minggu ini</label><input id="weeklyDone" type="number" min="0" max="500" value="0">
+<button id="saveWeekly">Simpan progres mingguan</button>
+<div class="progress" style="margin-top:14px"><span id="weeklyBar"></span></div>
+<p id="weeklyText" class="small">Belum ada progres tersimpan.</p>
+</div>
+</section>
+
+
+<section id="keyworddb" class="hidden">
+<div class="card">
+<h2>Database Keyword Assistant</h2>
+<p class="small">Riset tiga jenis aset seperti dalam video: Video, Vector, dan Image. Jumlah hasil pencarian diisi dari marketplace yang kamu periksa secara manual.</p>
+<label>Jenis aset</label><select id="dbType"><option>Image</option><option>Vector</option><option>Video</option></select>
+<label>Marketplace</label><select id="dbMarket"><option>Adobe Stock</option><option>Shutterstock</option><option>Freepik</option><option>Dreamstime</option><option>iStock</option></select>
+<label>Keyword / tema</label><input id="dbKeyword" placeholder="Contoh: minimal skincare product mockup">
+<label>Jumlah hasil pencarian</label><input id="dbCount" type="number" min="0" placeholder="Masukkan angka dari marketplace">
+<label>Catatan / kebutuhan buyer</label><textarea id="dbNotes" placeholder="Contoh: butuh copy space, vertical, isolated background"></textarea>
+<button id="dbSave">Simpan ke database</button>
+<div class="notice" style="margin-top:12px">Video menyarankan meninjau keyword dengan hasil di bawah 10.000. Angka kecil bukan jaminan penjualan; nilai juga permintaan, relevansi, kualitas, dan lisensi.</div>
+</div>
+<div class="card">
+<div class="row" style="justify-content:space-between"><h2>Data riset tersimpan</h2><span id="dbTotal" class="small">0 data</span></div>
+<label>Filter jenis aset</label><select id="dbFilter"><option>Semua</option><option>Image</option><option>Vector</option><option>Video</option></select>
+<div id="dbList" class="small">Belum ada data.</div>
+<div class="row" style="margin-top:12px"><button id="dbExport" class="secondary">Ekspor CSV riset</button><button id="dbClear" class="warn">Hapus database</button></div>
+</div>
+</section>
+<section id="aistudio" class="hidden">
+<div class="card">
+<h2>AI Image & Video Studio</h2>
+<p class="small">Pusat akses generator gratis tanpa API key pribadi. Layanan komunitas/public demo berjalan di situs pihak ketiga; antrean, resolusi, ketersediaan, dan batas pemakaian tidak dijamin. Aplikasi ini belum menjalankan GPU sendiri.</p>
+<label>Jenis hasil</label><select id="genType"><option value="image">AI Image · Text to Image</option><option value="video">AI Video · Text to Video / Image to Video</option></select>
+<label>Prompt aset microstock</label><textarea id="genPrompt" rows="5" placeholder="Contoh: realistic commercial stock photo of..."></textarea>
+<label>Gaya</label><select id="genStyle"><option>Photorealistic commercial stock photography</option><option>Clean vector illustration</option><option>Minimal 3D illustration</option><option>Cinematic realistic video</option><option>Abstract motion background</option></select>
+<label>Orientasi</label><select id="genRatio"><option>Vertical 9:16</option><option>Horizontal 16:9</option><option>Square 1:1</option></select>
+<div class="row" style="margin-top:12px"><button id="genBuild">Susun prompt</button><button id="genCopy" class="secondary">Salin prompt</button></div>
+<div id="genOutput" class="notice" style="margin-top:12px">Prompt yang sudah disusun akan muncul di sini.</div>
+</div>
+<div class="card"><h2>Generator gambar gratis</h2><p>AI Horde adalah layanan komunitas dengan worker sukarela. Bisa digunakan anonim tanpa API key pribadi, tetapi prioritas antrean anonim paling rendah.</p><a class="btn" href="https://aihorde.net/" target="_blank" rel="noopener">Buka AI Horde Image Generator ↗</a></div>
+<div class="card"><h2>Generator video gratis</h2><p>Demo publik LTX Video dapat digunakan tanpa API key pribadi ketika tersedia. Antrean, batas, dan ketersediaan bisa berubah.</p><a class="btn" href="https://huggingface.co/spaces/Lightricks/LTX-Video" target="_blank" rel="noopener">Buka LTX Video Demo ↗</a></div>
+<div class="notice">Batas jujur: generator gratis publik tidak selalu setara model berbayar termahal. GitHub Pages tidak menyediakan GPU; pembuatan dilakukan di layanan pihak ketiga. Jangan unggah gambar sensitif.</div>
+</section>
+<section id="settings" class="hidden">
+<div class="card">
+<h2>Mesin AI dan privasi · OPPO F11 Pro</h2>
+<p><b>AI lokal:</b> model captioning dijalankan di browser melalui Transformers.js. Model harus diunduh dari internet pada penggunaan awal. Ukuran dan kompatibilitas dapat berubah mengikuti model yang tersedia.</p>
+<p><b>AI cloud:</b> Gemini menerima gambar dan instruksi metadata. Gunakan API key pribadi dari Google AI Studio. API key tidak pernah dikirim ke server aplikasi ini, tetapi permintaan langsung dikirim dari browser ke Google.</p>
+<p><b>Catatan:</b> GitHub Pages hanya meng-host file statis. Jangan menaruh API key di kode, repository, atau file konfigurasi publik.</p>
+<button class="secondary" id="forgetKey">Bersihkan API key dari sesi ini</button>
+</div>
+<div class="card"><h2>Batas batch dan penyimpanan</h2><p>Batch maksimum 100 gambar per pemilihan. Proses berjalan satu per satu agar RAM 6 GB lebih stabil. Metadata disimpan lokal di browser melalui IndexedDB; file gambar asli tidak disimpan oleh aplikasi. Ekspor CSV secara berkala sebagai cadangan. Hapus data situs/browser dapat menghapus riwayat lokal.</p></div>
+</section>
+<footer>Microstock Studio V3.1 · Gratis digunakan · Periksa metadata secara manual sebelum upload.</footer>
+</main>
+<script type="module" src="./app.js"></script>
+</body></html>

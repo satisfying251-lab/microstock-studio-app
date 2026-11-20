@@ -1,1 +1,9 @@
-{"name":"Microstock Studio","short_name":"Microstock","start_url":"./index.html","display":"standalone","background_color":"#0b1220","theme_color":"#101827","description":"Offline microstock metadata assistant"}
+{
+  "name": "Microstock Studio V3.1",
+  "short_name": "Microstock V3.1",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#09111f",
+  "theme_color": "#101b2d",
+  "description": "Hybrid AI microstock metadata and keyword workspace optimized for Android"
+}
