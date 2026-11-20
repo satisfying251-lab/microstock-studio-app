@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="description" content="Microstock Studio V3.1.2 - hybrid AI microstock assistant">
+<meta name="description" content="Microstock Studio V3.2 - hybrid AI microstock assistant">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>Microstock Studio V3.1.2</title>
+<title>Microstock Studio V3.2</title>
 <style>
 :root{--bg:#09111f;--panel:#121f33;--panel2:#192b45;--line:#29415f;--text:#eaf2ff;--muted:#9db0ca;--mint:#54dfbd;--gold:#f3c86b;--red:#ff8585}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
@@ -40,11 +40,11 @@ footer{color:var(--muted);text-align:center;font-size:11px;padding:16px}
 </style>
 </head>
 <body>
-<header><h1>✦ Microstock Studio V3.1.2</h1><p>OPPO F11 Pro optimized · Hybrid AI · Batch 20–100 · Android 11</p></header>
+<header><h1>✦ Microstock Studio V3.2</h1><p>OPPO F11 Pro optimized · Hybrid AI · Batch 1–100 · Android 11</p></header>
 <main>
-<div class="tabs">
+<nav class="tabs" aria-label="Menu utama">
 <button data-tab="batch">Batch Analyzer</button><button class="secondary" data-tab="results">Hasil Metadata</button><button class="secondary" data-tab="strategy">Strategi Stock</button><button class="secondary" data-tab="keyworddb">Keyword Database</button><button class="secondary" data-tab="aistudio">AI Studio</button><button class="secondary" data-tab="settings">Mesin AI</button>
-</div>
+</nav>
 <section id="batch">
 <div class="card">
 <h2>1. Upload aset</h2>
@@ -166,7 +166,30 @@ footer{color:var(--muted);text-align:center;font-size:11px;padding:16px}
 </div>
 <div class="card"><h2>Batas batch dan penyimpanan</h2><p>Batch maksimum 100 gambar per pemilihan. Proses berjalan satu per satu agar RAM 6 GB lebih stabil. Metadata disimpan lokal di browser melalui IndexedDB; file gambar asli tidak disimpan oleh aplikasi. Ekspor CSV secara berkala sebagai cadangan. Hapus data situs/browser dapat menghapus riwayat lokal.</p></div>
 </section>
-<footer>Microstock Studio V3.1.2 · Gratis digunakan · Periksa metadata secara manual sebelum upload.</footer>
+<footer>Microstock Studio V3.2 · Gratis digunakan · Periksa metadata secara manual sebelum upload.</footer>
 </main>
-<script type="module" src="./app.js"></script>
+<script>
+/* Lightweight navigation fallback: menus stay clickable even if optional AI fails. */
+(function(){
+ const names=['batch','results','strategy','keyworddb','aistudio','settings'];
+ function show(tab){
+  if(!names.includes(tab)) tab='batch';
+  names.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('hidden',id!==tab)});
+  document.querySelectorAll('[data-tab]').forEach(btn=>{
+   const active=btn.dataset.tab===tab;
+   btn.classList.toggle('secondary',!active);
+   if(active)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current');
+  });
+ }
+ document.addEventListener('click',function(e){
+  const btn=e.target.closest('[data-tab]');
+  if(!btn)return;
+  show(btn.dataset.tab);
+  try{history.replaceState(null,'','#'+btn.dataset.tab)}catch(_){}
+ });
+ window.addEventListener('hashchange',()=>show(location.hash.slice(1)||'batch'));
+ show(location.hash.slice(1)||'batch');
+})();
+</script>
+<script type="module" src="./app.js?v=3.2.0"></script>
 </body></html>

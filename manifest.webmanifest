@@ -1,9 +1,9 @@
 {
-  "name": "Microstock Studio V3.1",
-  "short_name": "Microstock V3.1",
+  "name": "Microstock Studio V3.2",
+  "short_name": "Microstock V3.2",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#09111f",
   "theme_color": "#101b2d",
-  "description": "Hybrid AI microstock metadata and keyword workspace optimized for Android"
+  "description": "Microstock metadata and keyword workspace optimized for Android"
 }

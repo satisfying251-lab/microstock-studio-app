@@ -1,9 +1,7 @@
-import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
-env.allowLocalModels = false;
-env.useBrowserCache = true;
-
+// Core app intentionally has no remote imports. Navigation and all non-AI menus
+// must work even when the optional AI model CDN is unavailable.
 const $ = id => document.getElementById(id);
-let files = [], results = [], captioner = null, stopRequested = false;
+let files = [], results = [], captioner = null, transformerModule = null, stopRequested = false;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 // IndexedDB stores metadata only (not original image blobs) to keep phone storage manageable.
@@ -14,8 +12,20 @@ async function loadResultsLocal(){try{const db=await openMetaDB();const saved=aw
 
 function setStatus(t){$('progressText').textContent=t}
 function setProgress(done,total){$('bar').style.width=(total?done/total*100:0)+'%'}
-function setTab(tab){for(const id of ['batch','results','strategy','keyworddb','aistudio','settings'])$(id).classList.toggle('hidden',id!==tab);document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('secondary',b.dataset.tab!==tab)})}
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function setTab(tab){
+ const valid=['batch','results','strategy','keyworddb','aistudio','settings'];
+ if(!valid.includes(tab)) tab='batch';
+ for(const id of valid) $(id).classList.toggle('hidden',id!==tab);
+ document.querySelectorAll('[data-tab]').forEach(b=>{
+  const active=b.dataset.tab===tab;
+  b.classList.toggle('secondary',!active);
+  if(active) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+ });
+ try { history.replaceState(null,'','#'+tab); } catch(e) {}
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+window.addEventListener('hashchange',()=>setTab(location.hash.slice(1)||'batch'));
+setTab(location.hash.slice(1)||'batch');
 $('mode').onchange=()=>{let m=$('mode').value;$('localInfo').classList.toggle('hidden',m!=='local');$('cloudInfo').classList.toggle('hidden',m!=='cloud');$('hybridInfo').classList.toggle('hidden',m!=='hybrid');$('keyWrap').classList.toggle('hidden',m==='local')};$('mode').onchange();
 function extensionOf(name){const m=String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);return m?m[1]:''}
 function mimeForFile(file){
@@ -95,9 +105,20 @@ function renderThumbs(){
 $('clearBtn').onclick=()=>{files=[];renderThumbs();$('analyzeBtn').disabled=true};
 $('forgetKey').onclick=()=>{$('apiKey').value='';alert('API key dibersihkan dari sesi halaman.')};
 async function getCaption(file){
- if(!captioner){setStatus('Mengunduh model AI lokal (pertama kali)...');captioner=await pipeline('image-to-text','Xenova/vit-gpt2-image-captioning',{progress_callback:p=>{if(p.status==='progress')setStatus(`Mengunduh model lokal: ${p.file||''} ${Math.round(p.progress||0)}%`)}})}
+ if(!captioner){
+  setStatus('Memuat mesin AI lokal. Menu lain tetap bisa digunakan selama proses ini...');
+  if(!transformerModule){
+   transformerModule=await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+   transformerModule.env.allowLocalModels=false;
+   transformerModule.env.useBrowserCache=true;
+  }
+  captioner=await transformerModule.pipeline('image-to-text','Xenova/vit-gpt2-image-captioning',{
+   progress_callback:p=>{if(p.status==='progress')setStatus(`Mengunduh model lokal: ${p.file||''} ${Math.round(p.progress||0)}%`)}
+  });
+ }
  const url=URL.createObjectURL(file);
- try{const out=await captioner(url,{max_new_tokens:48});return out?.[0]?.generated_text||''}finally{URL.revokeObjectURL(url)}
+ try{const out=await captioner(url,{max_new_tokens:48});return out?.[0]?.generated_text||''}
+ finally{URL.revokeObjectURL(url)}
 }
 async function gemini(file,caption,lang){
  const key=$('apiKey').value.trim();if(!key)throw new Error('API key Gemini belum diisi.');
@@ -140,8 +161,14 @@ $('analyzeBtn').onclick=async()=>{
     results[i]=normalize(meta,f,cap);
     await saveResultsLocal();
    }catch(err){
-    if(mode==='hybrid'&&cap){results[i]=normalize(makeFallback(f,cap),f,cap);results[i].visual_notes+=' Cloud gagal: '+err.message;await saveResultsLocal()}
-    else{results[i]=normalize({title:f.name,description:'Analisis gagal: '+err.message,keywords:[],category:'Needs review',visual_notes:'Gagal dianalisis. Coba lagi atau gunakan mode lain.'},f,'');await saveResultsLocal()}
+    if(mode==='hybrid'){
+     results[i]=normalize(makeFallback(f,cap),f,cap);
+     results[i].visual_notes+=' Analisis AI tidak selesai: '+err.message+' Periksa koneksi/model atau gunakan Gemini dengan API key.';
+     await saveResultsLocal();
+    }else{
+     results[i]=normalize({title:f.name,description:'Analisis gagal: '+err.message,keywords:[],category:'Needs review',visual_notes:'Gagal dianalisis. Coba lagi atau gunakan mode lain.'},f,'');
+     await saveResultsLocal();
+    }
    }
    done++;setProgress(done,files.length);setStatus(`${done}/${files.length} selesai`);
    renderResults();
